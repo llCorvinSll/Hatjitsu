@@ -1,20 +1,19 @@
 import {IAngularStatic} from "angular";
+import { io } from "socket.io-client";
+import * as Cookies from "js-cookie";
 
 declare var angular:IAngularStatic;
-
 
 export const pokerAppServices = angular.module('pokerApp.services', []);
 
 pokerAppServices.value('version', '0.1');
 
 pokerAppServices.factory('socket', ['$rootScope', function ($rootScope) {
-  const socket = io.connect(location.protocol + '//' + location.host, {
-    // 'port': location.port,
-    'reconnect': true,
-    'reconnection delay': 500,
-    'max reconnection attempts': 10,
-    'try multiple transports': true,
-    'transports': ['websocket']
+  const socket = io({
+    reconnection: true,
+    reconnectionDelay: 500,
+    reconnectionAttempts: 10,
+    transports: ['websocket']
   });
 
   $rootScope.socketMessage = null;
@@ -71,15 +70,15 @@ pokerAppServices.factory('socket', ['$rootScope', function ($rootScope) {
   });
 
   socket.on('connect', function () {
-    var sessionId = this.id;
+    var sessionId = socket.id;
     // console.log('service: on connect');
     $rootScope.$apply(function () {
       $rootScope.socketMessage = null;
       // console.log("new session id = " + sessionId);
-      if (!$.cookie("sessionId")) {
-        $.cookie("sessionId", sessionId);
+      if (!Cookies.get("sessionId")) {
+        Cookies.set("sessionId", sessionId);
       }
-      $rootScope.sessionId = $.cookie("sessionId");
+      $rootScope.sessionId = Cookies.get("sessionId");
       // console.log("session id = " + that.rootScope.sessionId);
     });
   });

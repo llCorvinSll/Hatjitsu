@@ -1,4 +1,7 @@
 import {DropDown, ScrollIntoView } from "./dom";
+import * as _ from "underscore";
+import * as Cookies from "js-cookie";
+
 
 export function LobbyCtrl($scope, $location, socket) {
   $scope.disableButtons = false;
@@ -192,9 +195,9 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
   var refreshRoomInfo = function (roomObj) {
     // console.log("refreshRoomInfo: roomObj:", roomObj)
     if (roomObj.createAdmin) {
-      $.cookie("admin-" + roomObj.roomUrl, true);
+      Cookies.set("admin-" + roomObj.roomUrl, true);
     }
-    if ($.cookie("admin-" + roomObj.roomUrl)) {
+    if (Cookies.get("admin-" + roomObj.roomUrl)) {
       $scope.showAdmin = true;
     }
 
@@ -293,12 +296,12 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
 
     socket.on('connect', function () {
       // console.log("on connect");
-      var sessionId = this.id;
+      var sessionId = socket.id;
       // console.log("new socket id = " + sessionId);
-      if (!$.cookie("sessionId")) {
-        $.cookie("sessionId", sessionId);
+      if (!Cookies.get("sessionId")) {
+        Cookies.set("sessionId", sessionId);
       }
-      $scope.sessionId = $.cookie("sessionId");
+      $scope.sessionId = Cookies.get("sessionId");
       // console.log("session id = " + $scope.sessionId);
       // console.log("emit join room", { roomUrl: $scope.roomId, sessionId: $scope.sessionId });
       socket.emit('join room', { roomUrl: $scope.roomId, sessionId: $scope.sessionId }, function (response) {
