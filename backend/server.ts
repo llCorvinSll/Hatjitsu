@@ -10,7 +10,7 @@ import {Room} from "./lib/room";
 const env = 'development';
 
 const gzippo = require('gzippo');
-const config = require('./config.js')[env];
+const config = require('../config.js')[env];
 
 const app = module.exports = express();
 
@@ -46,35 +46,35 @@ const options = {
 var CDN = require('express-cdn')(app, options);
 
 
-app.set('views', __dirname + '/app');
+app.set('views', __dirname + '/../frontend');
 app.set('view engine', 'ejs');
 app.set('view options', {
     layout: false
 });
-// app.use(express.logger());
-// app.use(express.bodyParser());
-// app.use(express.methodOverride());
-// app.use(express.staticCache());
+// frontend.use(express.logger());
+// frontend.use(express.bodyParser());
+// frontend.use(express.methodOverride());
+// frontend.use(express.staticCache());
 
 
-app.use(express.static(__dirname + '/app'));
+app.use(express.static(__dirname + '/../frontend'));
 
 
 if (env == "development") {
-  // app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  // frontend.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
 }
 
 if (env == "production") {
   var oneDay = 86400000;
-  // app.use(assetsManagerMiddleware);
-  app.use(gzippo.staticGzip(__dirname + '/app'));
-  // app.use(express.errorHandler());
+  // frontend.use(assetsManagerMiddleware);
+  app.use(gzippo.staticGzip(__dirname + '/frontend'));
+  // frontend.use(express.errorHandler());
 }
 
 app.locals.CDN = CDN
 // Add the dynamic view helper
-// app.dynamicHelpers({ CDN: CDN });
+// frontend.dynamicHelpers({ CDN: CDN });
 
 app.get('/', function(req, res) {
   res.render('index.ejs');

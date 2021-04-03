@@ -13,12 +13,13 @@ results
 
 node_modules
 npm-debug.log
-app/generated
+frontend/generated
 .DS_Store
 
 
-lib/*.js
-lib/*.js.map
+backend/lib/*.js
+backend/lib/*.js.map
+backend/server.js
+backend/server.js.map
 
-server.js
-server.js.map
+frontend/_build
