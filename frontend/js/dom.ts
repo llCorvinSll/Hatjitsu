@@ -1,11 +1,10 @@
-/*jslint indent: 2, browser: true */
-/*global angular, $, document */
+
 
 $(function () {
   $('.no-js-hide').removeClass('no-js-hide');
 });
 
-function DropDown(el) {
+export function DropDown(el) {
   this.dd = el;
   this.val = '';
   this.initEvents();
@@ -26,7 +25,7 @@ DropDown.prototype = {
   }
 };
 
-function ScrollIntoView(el) {
+export function ScrollIntoView(el) {
   this.el = el;
 }
 ScrollIntoView.prototype = {

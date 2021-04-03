@@ -1,12 +1,11 @@
-/*jslint indent: 2, browser: true */
-/*global angular */
+import {IAngularStatic} from "angular";
 
-'use strict';
-
-/* Directives */
+declare var angular: IAngularStatic;
 
 
-angular.module('pokerApp.directives', []).
+export const directivesServices = angular.module('pokerApp.directives', []);
+
+directivesServices.
   directive('appVersion', ['version', function (version) {
     return function (scope, elm, attrs) {
       elm.text(version);

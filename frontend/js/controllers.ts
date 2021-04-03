@@ -1,53 +1,6 @@
-/*jslint indent: 2, browser: true */
-/*global angular, _, $, ScrollIntoView, DropDown */
+import {DropDown, ScrollIntoView } from "./dom";
 
-'use strict';
-
-/* Controllers */
-
-function MainCtrl($scope, $timeout) {
-  $scope.logoState = '';
-  $scope.errorMessage = null;
-  $scope.message = null;
-
-  $scope.$on('$routeChangeSuccess', function () {
-    $scope.logoState = '';
-    $scope.bodyState = '';
-  });
-  $scope.$on('unanimous vote', function () {
-    $scope.logoState = ' header__logo--green';
-    $scope.bodyState = ' body--green';
-  });
-  $scope.$on('not unanimous vote', function () {
-    $scope.logoState = ' header__logo--yellow';
-    $scope.bodyState = ' body--yellow';
-  });
-  $scope.$on('problem vote', function () {
-    $scope.logoState = ' header__logo--red';
-    $scope.bodyState = ' body--red';
-  });
-  $scope.$on('unfinished vote', function () {
-    $scope.logoState = '';
-    $scope.bodyState = '';
-  });
-
-  $scope.$on('show message', function (evnt, msg) {
-    $scope.message = msg;
-    $timeout(function () {
-      $scope.message = null;
-    }, 4000);
-  });
-  $scope.$on('show error', function (evnt, msg) {
-    $scope.errorMessage = msg;
-    $timeout(function () {
-      $scope.errorMessage = null;
-    }, 3000);
-  });
-}
-
-MainCtrl.$inject = ['$scope', '$timeout'];
-
-function LobbyCtrl($scope, $location, socket) {
+export function LobbyCtrl($scope, $location, socket) {
   $scope.disableButtons = false;
   $scope.createRoom = function () {
     // console.log('createRoom: emit create room');
@@ -107,7 +60,7 @@ function cardValue(vote){
   }
 }
 
-function RoomCtrl($scope, $routeParams, $timeout, socket) {
+export function RoomCtrl($scope, $routeParams, $timeout, socket) {
 
   var processMessage = function (response, process) {
     // console.log("processMessage: response:", response)
@@ -447,3 +400,46 @@ function RoomCtrl($scope, $routeParams, $timeout, socket) {
 }
 
 RoomCtrl.$inject = ['$scope', '$routeParams', '$timeout', 'socket'];
+
+
+export function MainCtrl($scope, $timeout) {
+  $scope.logoState = '';
+  $scope.errorMessage = null;
+  $scope.message = null;
+
+  $scope.$on('$routeChangeSuccess', function () {
+    $scope.logoState = '';
+    $scope.bodyState = '';
+  });
+  $scope.$on('unanimous vote', function () {
+    $scope.logoState = ' header__logo--green';
+    $scope.bodyState = ' body--green';
+  });
+  $scope.$on('not unanimous vote', function () {
+    $scope.logoState = ' header__logo--yellow';
+    $scope.bodyState = ' body--yellow';
+  });
+  $scope.$on('problem vote', function () {
+    $scope.logoState = ' header__logo--red';
+    $scope.bodyState = ' body--red';
+  });
+  $scope.$on('unfinished vote', function () {
+    $scope.logoState = '';
+    $scope.bodyState = '';
+  });
+
+  $scope.$on('show message', function (evnt, msg) {
+    $scope.message = msg;
+    $timeout(function () {
+      $scope.message = null;
+    }, 4000);
+  });
+  $scope.$on('show error', function (evnt, msg) {
+    $scope.errorMessage = msg;
+    $timeout(function () {
+      $scope.errorMessage = null;
+    }, 3000);
+  });
+}
+
+MainCtrl.$inject = ['$scope', '$timeout'];

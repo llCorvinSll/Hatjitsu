@@ -47,7 +47,7 @@ const config = {
     mode,
     target: "web",
     devtool: devtool,
-    entry: ["./js/app.js"],
+    entry: ["./js/app.ts"],
     output: {
         filename: "bundle.js",
         path: modules_path,
@@ -65,20 +65,15 @@ const config = {
                 test: /\.tsx?$/,
                 exclude: [
                     path.resolve(__dirname, "node_modules"),
-                    path.resolve(__dirname, "_build/_build"),
+                    path.resolve(__dirname, "_build"),
                     path.resolve(__dirname, "tools"),
                 ],
                 use: [
-                    { loader: "remove-logs-loader" },
-                    { loader: "i18n-loader" },
-                    { loader: "exclude-directories-loader" },
                     {
                         loader: "ts-loader",
                         options: {
                             compilerOptions: {
                                 sourceMap: devMode,
-                                // TODO: для разработки в браузере можно брать другую цель
-                                // target: "es2017"
                             },
                             onlyCompileBundledFiles: true,
                             configFile: tsconfig,
