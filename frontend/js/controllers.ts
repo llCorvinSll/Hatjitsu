@@ -238,14 +238,14 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
     socket.on('room joined', function () {
       // console.log("on room joined");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
     socket.on('room left', function () {
       // console.log("on room left");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
@@ -253,35 +253,35 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
       $scope.$emit('show message', 'Card pack changed...');
       // console.log("on card pack set");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
     socket.on('voter status changed', function () {
       // console.log("on voter status changed");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
     socket.on('voted', function () {
       // console.log("on voted");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
     socket.on('unvoted', function () {
       // console.log("on unvoted");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
     socket.on('vote reset', function () {
       // console.log("on vote reset");
       // console.log("emit room info", { roomUrl: $scope.roomId });
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });
@@ -289,7 +289,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
     socket.on('reveal', function () {
       // console.log("reveal event received");
       // setLocalVote(null);
-      this.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+      socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
         processMessage(response, refreshRoomInfo);
       });
     });

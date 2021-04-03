@@ -4,6 +4,9 @@ import {pokerAppServices} from "./services";
 import {filtersModule} from "./filters";
 import {directivesServices} from "./directives";
 
+$(function () {
+    $('.no-js-hide').removeClass('no-js-hide');
+});
 
 declare var angular: IAngularStatic;
 
