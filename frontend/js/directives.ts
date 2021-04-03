@@ -13,8 +13,8 @@ directivesServices.
   }]).
   directive('cardvalue', function () {
     return function (scope, elm, attrs) {
-      var value = scope.card || scope.vote.vote,
-        code = isNaN(parseInt(value, 10)) ? value.charCodeAt() : value;
+      var value = scope.card || scope.vote.vote;
+      var code = isNaN(parseInt(value, 10)) ? value.charCodeAt() : value;
       elm.addClass('card--' + code);
     };
   }).

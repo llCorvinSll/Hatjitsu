@@ -1,7 +1,9 @@
 import {DropDown, ScrollIntoView } from "./dom";
 import * as _ from "underscore";
 import * as Cookies from "js-cookie";
+import {IAngularStatic} from "angular";
 
+declare var angular: IAngularStatic;
 
 export function LobbyCtrl($scope, $location, socket) {
   $scope.disableButtons = false;
@@ -65,8 +67,8 @@ function cardValue(vote){
 
 export function RoomCtrl($scope, $routeParams, $timeout, socket) {
 
-  var processMessage = function (response, process) {
-    // console.log("processMessage: response:", response)
+  const processMessage = function (response, process) {
+    console.log("processMessage: response:", response)
     if (response.error) {
       $scope.$emit('show error', response.error);
     } else {
@@ -108,7 +110,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
         });
       }
 
-      var uniqVotes = _.chain($scope.votes).pluck('vote').uniq().value().length;
+      const uniqVotes = _.chain($scope.votes).pluck('vote').uniq().value().length;
       if (uniqVotes === 1) {
         $scope.$emit('unanimous vote');
       } else if (uniqVotes === $scope.voterCount) {
@@ -132,7 +134,9 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
   };
 
   var haveIVoted = function () {
-    if ($scope.myVote === 'undefined' || $scope.myVote === null) {
+
+    console.log("myVote", $scope.myVote)
+    if (!$scope.myVote) {
       return false;
     }
     return true;
@@ -143,6 +147,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
   };
 
   var setVotingState = function () {
+    console.log($scope)
     $scope.cardsState = votingFinished() || !$scope.voter ? ' card--disabled' : '';
     $scope.votingState = votingFinished() ? ' flipped-stagger' : '';
   };
@@ -193,6 +198,8 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
   };
 
   var refreshRoomInfo = function (roomObj) {
+
+    console.log(roomObj)
     // console.log("refreshRoomInfo: roomObj:", roomObj)
     if (roomObj.createAdmin) {
       Cookies.set("admin-" + roomObj.roomUrl, true);
@@ -211,13 +218,16 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
     $scope.votes = _.chain($scope.connections).filter(function (c) {
       return c.vote;
     }).values().value();
-    $scope.voterCount = _.filter($scope.connections, function (c) {
+
+    console.log("votes", $scope.votes)
+    $scope.voterCount = _.map($scope.connections, function (c) {
       return c.voter;
     }).length;
 
-    var connection = myConnectionHash();
+    const connection = myConnectionHash();
 
     if (connection) {
+      console.log(connection)
       $scope.voter = connection.voter;
       $scope.myVote = connection.vote;
       $scope.voted = haveIVoted();
@@ -318,7 +328,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
     });
   };
 
-  $scope.setCardPack = function (cardPack) {
+  $scope.setCardPack = function (cardPack: string) {
     $scope.cardPack = cardPack;
     $scope.resetVote();
 
@@ -326,7 +336,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
     socket.emit('set card pack', { roomUrl: $scope.roomId, cardPack: cardPack });
   };
 
-  $scope.vote = function (vote) {
+  $scope.vote = function (vote: string) {
     if ($scope.myVote !== vote) {
       if (!votingFinished() && $scope.voter) {
         setLocalVote(vote);
