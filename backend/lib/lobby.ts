@@ -12,7 +12,7 @@ export class Lobby {
   rooms: {[key: string]: Room} = {};
 
 
-  createRoom(roomUrl?: string) {
+  createRoom(roomUrl?: string): string {
     roomUrl = roomUrl === undefined ? this.createUniqueURL() : roomUrl + this.createUniqueURL();
     if (this.rooms[roomUrl]) {
       this.createRoom(roomUrl);

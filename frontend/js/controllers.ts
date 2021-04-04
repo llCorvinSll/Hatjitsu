@@ -2,6 +2,7 @@ import {DropDown, ScrollIntoView } from "./dom";
 import * as _ from "underscore";
 import * as Cookies from "js-cookie";
 import {IAngularStatic} from "angular";
+import {Commands} from "@shared/protocol";
 
 declare var angular: IAngularStatic;
 
@@ -10,7 +11,7 @@ export function LobbyCtrl($scope, $location, socket) {
   $scope.createRoom = function () {
     // console.log('createRoom: emit create room');
     $scope.disableButtons = true;
-    socket.emit('create room', {}, function (roomUrl) {
+    socket.emit(Commands.CREATE_ROOM, {}, function (roomUrl) {
       $location.path(roomUrl);
     });
   };
@@ -364,7 +365,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
 
   $scope.resetVote = function () {
     // console.log("emit reset vote", { roomUrl: $scope.roomId });
-    socket.emit('reset vote', { roomUrl: $scope.roomId }, function (response) {
+    socket.emit(Commands.RESET_VOTE, { roomUrl: $scope.roomId }, function (response) {
       processMessage(response);
     });
   };
@@ -372,7 +373,7 @@ export function RoomCtrl($scope, $routeParams, $timeout, socket) {
   $scope.forceReveal = function () {
     // console.log("emit force reveal", { roomUrl: $scope.roomId });
     $scope.forceRevealDisable = true;
-    socket.emit('force reveal', { roomUrl: $scope.roomId }, function (response) {
+    socket.emit(Commands.FORCE_REVEAL, { roomUrl: $scope.roomId }, function (response) {
       processMessage(response);
     });
   };

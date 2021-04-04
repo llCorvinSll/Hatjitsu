@@ -5,6 +5,7 @@ import http from 'http';
 import * as socketio from "socket.io";
 import {Lobby} from "./lib/lobby";
 import {Room} from "./lib/room";
+import {Commands} from "@shared/protocol";
 
 // const env = process.env.NODE_ENV || 'development';
 const env = 'development';
@@ -122,8 +123,6 @@ io.on('connection', function (socket) {
   statsConnectionCount++;
   statsSocketCount++;
 
-  console.log("On connect", socket.id);
-
   socket.on('disconnect', function () {
     statsDisconnectCount++;
     statsSocketCount--;
@@ -188,7 +187,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('unvote', function (data, callback) {
+  socket.on(Commands.UNVOTE, function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("omn unvote received for " + data.roomUrl, socket.id, data);
     const room = lobby.getRoom(data.roomUrl);
@@ -202,7 +201,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('reset vote', function (data, callback) {
+  socket.on(Commands.RESET_VOTE, function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("on reset vote  received for " + data.roomUrl, socket.id, data);
     const room = lobby.getRoom(data.roomUrl);
@@ -216,7 +215,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('force reveal', function (data, callback) {
+  socket.on(Commands.FORCE_REVEAL, function (data, callback) {
     statsSocketMessagesReceived++;
     const room = lobby.getRoom(data.roomUrl);
     if (!(room instanceof Room) && room.error) {
@@ -229,7 +228,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('sort votes', function (data, callback) {
+  socket.on(Commands.SORT_VOTES, function (data, callback) {
     statsSocketMessagesReceived++;
     const room = lobby.getRoom(data.roomUrl);
     if (!(room instanceof Room) && room.error) {
@@ -242,7 +241,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('toggle voter', function (data, callback) {
+  socket.on(Commands.TOGGLE_VOTER, function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("on toggle voter for " + data.roomUrl, socket.id, data);
     const room = lobby.getRoom(data.roomUrl);

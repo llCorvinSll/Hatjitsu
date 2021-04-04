@@ -1,9 +1,10 @@
 "use strict";
-const version = require("./package.json").version;
+const version = require("../package.json").version;
 const path = require("path");
 const modules_path = path.resolve(__dirname, "./_build");
 const argv = require("yargs").argv;
 const TerserPlugin = require("terser-webpack-plugin");
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 let mode = "development";
 
@@ -47,7 +48,7 @@ const config = {
     mode,
     target: "web",
     devtool: devtool,
-    entry: ["./js/app.ts"],
+    entry: ["./js/index.tsx"],
     output: {
         filename: "bundle.js",
         path: modules_path,
@@ -56,6 +57,7 @@ const config = {
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
         plugins: [
+            new TsconfigPathsPlugin({/* options: see below */})
         ],
         modules: ["node_modules"],
     },
@@ -64,9 +66,7 @@ const config = {
             {
                 test: /\.tsx?$/,
                 exclude: [
-                    path.resolve(__dirname, "node_modules"),
                     path.resolve(__dirname, "_build"),
-                    path.resolve(__dirname, "tools"),
                 ],
                 use: [
                     {
