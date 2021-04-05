@@ -1,6 +1,7 @@
 import * as _ from "underscore";
 import {Room} from "./room";
 import * as socketio from "socket.io";
+import {ServerEvents} from "../../shared/protocol";
 
 
 export class Lobby {
@@ -12,7 +13,7 @@ export class Lobby {
   rooms: {[key: string]: Room} = {};
 
 
-  createRoom(roomUrl?: string): string {
+  createRoom(roomUrl?: string): Room {
     roomUrl = roomUrl === undefined ? this.createUniqueURL() : roomUrl + this.createUniqueURL();
     if (this.rooms[roomUrl]) {
       this.createRoom(roomUrl);
@@ -28,7 +29,7 @@ export class Lobby {
     });
 
     this.rooms[roomUrl] = new Room(this.io, roomUrl);
-    return roomUrl;
+    return this.rooms[roomUrl];
   };
 
   createUniqueURL() {
@@ -43,13 +44,13 @@ export class Lobby {
 
   joinRoom(socket: socketio.Socket, data): Room | {error: string} {
     if(data.roomUrl && data.roomUrl in this.rooms) {
-      var room = this.getRoom(data.roomUrl);
+      const room = this.getRoom(data.roomUrl);
       if (socket != null && data && data.sessionId != null) {
         if (room instanceof Room) {
           room.enter(socket, data);
+          socket.join(data.roomUrl);
+          socket.broadcast.to(data.roomUrl).emit(ServerEvents.ROOM_JOINED, room.json());
         }
-        socket.join(data.roomUrl);
-        socket.broadcast.to(data.roomUrl).emit('room joined');
       }
       return room;
     } else {

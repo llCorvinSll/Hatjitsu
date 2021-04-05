@@ -3,9 +3,13 @@
   "compilerOptions": {
     "jsx": "react",
     "target": "es6",
-    "lib": ["DOM"]
+    "lib": [
+      "DOM"
+    ],
   },
   "references": [
-    {"path": "../shared"}
+    {
+      "path": "../shared"
+    }
   ]
 }

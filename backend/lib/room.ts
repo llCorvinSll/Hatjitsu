@@ -1,13 +1,6 @@
 import * as _ from "underscore";
 import * as socketio from "socket.io";
-
-
-interface IConnectionDescription {
-  sessionId: string;
-  socketId: string | null;
-  vote: string | null;
-  voter: boolean;
-}
+import {Decks, IConnectionDescription, IRoomState, ServerEvents} from "../../shared/protocol";
 
 
 export class Room {
@@ -49,9 +42,9 @@ export class Room {
     }
   }
 
-  setCardPack(data) {
+  setCardPack(data: { roomUrl: string, cardPack: Decks}) {
     this.cardPack = data.cardPack;
-    this.io.sockets.in(this.roomUrl).emit('card pack set');
+    this.io.sockets.in(this.roomUrl).emit(ServerEvents.CARD_PACK_SET, this.json());
     // console.log('card pack set');
   }
 
@@ -107,7 +100,7 @@ export class Room {
   }
 
   json() {
-    return {
+    return <IRoomState>{
       roomUrl: this.roomUrl,
       createdAt: this.createdAt,
       createAdmin: this.createAdmin,
@@ -115,7 +108,9 @@ export class Room {
       cardPack: this.cardPack,
       forcedReveal: this.forcedReveal,
       alreadySorted: this.alreadySorted,
-      connections: _.map(this.connections, (c) => { return c.socketId })
+      connections: _.map(this.connections, (c) => {
+        return c
+      })
     };
   }
 }

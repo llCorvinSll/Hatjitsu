@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": [
-        "./shared/*"
-      ]
+//      "@shared/*": [
+//        "../shared/*"
+//      ]
     }
   },
   "exclude": [

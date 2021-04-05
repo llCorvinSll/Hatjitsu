@@ -1,6 +1,7 @@
 import {io, Socket} from "socket.io-client";
-import {ClientEmitMap, Commands, EventsMap} from "@shared/protocol";
+import {ClientEmitMap, ClientListenMap, Commands, Decks, IRoomState, ServerEvents} from "../../../shared/protocol";
 import * as Cookies from "js-cookie";
+import {BehaviorSubject} from "rxjs";
 
 
 export class Api {
@@ -12,20 +13,6 @@ export class Api {
             transports: ['websocket']
         });
 
-        // this.socket.on('error', function (reason) {
-        //     // console.log('service: on error', reason);
-        //     $rootScope.$apply(function () {
-        //         $rootScope.socketMessage = ":-(  Error = " + reason;
-        //     });
-        // });
-
-        // this.socket.on('connect_failed', function (reason) {
-        //     // console.log('service: on connect failed', reason);
-        //     $rootScope.$apply(function () {
-        //         $rootScope.socketMessage = ":-(  Connect failed";
-        //     });
-        // });
-
         this.socket.on('disconnect', function () {
             console.log('service: on disconnect');
             // $rootScope.$apply(function () {
@@ -33,58 +20,120 @@ export class Api {
             // });
         });
 
-        // this.socket.on('connecting', function () {
-        //      console.log('service: on connecting');
-        //     $rootScope.$apply(function () {
-        //         $rootScope.socketMessage = "Connecting...";
-        //     });
-        // });
-
-        // this.socket.on('reconnecting', function () {
-        //     // console.log('service: on reconnecting');
-        //     $rootScope.$apply(function () {
-        //         $rootScope.socketMessage = "Reconnecting...";
-        //     });
-        // });
-
-        // this.socket.on('reconnect', function () {
-        //     // console.log('service: on reconnect');
-        //     $rootScope.$apply(function () {
-        //         $rootScope.socketMessage = null;
-        //     });
-        // });
-
-        // this.socket.on('reconnect_failed', function () {
-        //     // console.log('service: on reconnect_failed');
-        //     $rootScope.$apply(function () {
-        //         $rootScope.socketMessage = ":-( Reconnect failed";
-        //     });
-        // });
-
         this.socket.on('connect', () => {
             const sessionId = this.socket.id;
             console.log('service: on connect');
 
-            // $rootScope.socketMessage = null;
-            // console.log("new session id = " + sessionId);
             if (!Cookies.get("sessionId")) {
                 Cookies.set("sessionId", sessionId);
             }
             this.sessionId = Cookies.get("sessionId");
-            // console.log("session id = " + that.rootScope.sessionId);
+
+            this.connected.next(true)
         });
     }
 
-    createRoom(): Promise<string> {
-        return new Promise<string>((ok, fail) => {
-            this.socket.emit(Commands.CREATE_ROOM, null, (url: string) => {
-                ok(url)
+    setCardPack(cardPack: Decks) {
+        // $scope.resetVote();
+
+        this.socket.emit(Commands.SET_CARD_PACK, { roomUrl: this.currentRoom.value.roomUrl, cardPack: cardPack }, (room) => {
+            this.currentRoom.next(room)
+        });
+    };
+
+    createRoom(): Promise<IRoomState> {
+        return new Promise<IRoomState>((ok, fail) => {
+            this.socket.emit(Commands.CREATE_ROOM, null, (room: IRoomState) => {
+                this.currentRoom.next(room)
+                ok(room)
             })
         })
     }
 
+    joinRoom(roomId: string) {
+        this.subscribeToRoomEvents()
 
-    private socket: Socket<ClientEmitMap>;
+        const args = {roomUrl: roomId, sessionId: this.sessionId!!};
+        console.log("joining room", args)
+
+        this.socket.emit(Commands.JOIN_ROOM, args, (room) => {
+            this.currentRoom.next(room)
+        });
+    }
+
+    private subscribeToRoomEvents() {
+        this.socket.on(ServerEvents.ROOM_JOINED,  (room) => {
+            this.currentRoom.next(room);
+        });
+
+        this.socket.on(ServerEvents.ROOM_LEFT,  (room) => {
+            this.currentRoom.next(room);
+        });
+
+        this.socket.on(ServerEvents.CARD_PACK_SET,  (room) => {
+            this.currentRoom.next(room);
+        });
+    }
+
+    private socket: Socket<ClientListenMap, ClientEmitMap>;
+
+    public currentRoom: BehaviorSubject<IRoomState> = new BehaviorSubject<IRoomState>({
+        roomUrl: "",
+        createdAt: "",
+        createAdmin: false,
+        hasAdmin: false,
+        cardPack: Decks.GOAT,
+        forcedReveal: false,
+        alreadySorted: false,
+        connections: []
+    });
+
+    public connected: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private sessionId?: string;
 }
+
+
+function  configureRoom() {
+
+    socket.on('voter status changed', function () {
+        // console.log("on voter status changed");
+        // console.log("emit room info", { roomUrl: $scope.roomId });
+        socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+            processMessage(response, refreshRoomInfo);
+        });
+    });
+    socket.on('voted', function () {
+        // console.log("on voted");
+        // console.log("emit room info", { roomUrl: $scope.roomId });
+        socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+            processMessage(response, refreshRoomInfo);
+        });
+    });
+    socket.on('unvoted', function () {
+        // console.log("on unvoted");
+        // console.log("emit room info", { roomUrl: $scope.roomId });
+        socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+            processMessage(response, refreshRoomInfo);
+        });
+    });
+    socket.on('vote reset', function () {
+        // console.log("on vote reset");
+        // console.log("emit room info", { roomUrl: $scope.roomId });
+        socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+            processMessage(response, refreshRoomInfo);
+        });
+    });
+
+    socket.on('reveal', function () {
+        // console.log("reveal event received");
+        // setLocalVote(null);
+        socket.emit('room info', { roomUrl: $scope.roomId }, function (response) {
+            processMessage(response, refreshRoomInfo);
+        });
+    });
+
+    socket.on('disconnect', function () {
+        // console.log("on disconnect");
+    });
+};

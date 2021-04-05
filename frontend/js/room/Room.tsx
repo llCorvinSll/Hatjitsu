@@ -1,10 +1,29 @@
 import * as React from "react";
+import {useEffect, useState} from "react";
+import {chooseCardPack, Decks} from "../../../shared/protocol";
+import {Api} from "../api/Api";
 
 
-export function Room() {
+interface IRoomProps {
+    api: Api;
+}
+
+export function Room(props: IRoomProps) {
+    const [state, setState] = useState(props.api.currentRoom.value)
+
+    useEffect(() => {
+        const subscription = props.api.currentRoom.subscribe((room) => {
+            console.log(room);
+            setState(room)
+        })
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [state.roomUrl]);
+
     return (
-        <div ng-init="configureRoom()">
-            <p className="roomNumber">Room: roomId</p>
+        <div>
+            <p className="roomNumber">Room: {state.roomUrl}</p>
 
             <section className="cardPanel">
                 <div className="row cardPanel-meta">
@@ -16,35 +35,20 @@ export function Room() {
                             <span>You have chosen not to vote.</span>
                         </div>
                     </div>
-                    <div ng-switch className="span2 pullright">
-                        <div ng-switch-when="true">
-                            <div id="dd" className="dropdown-wrapper btn">
-                                <span>Mountain Goat pack</span>
-                                <ul className="dropdown">
-                                    <li className="dropdown__item"><a href="#" ng-model="cardPack" id="deckGoat"
-                                                                      ng-click="setCardPack('goat')">Mountain Goat</a>
-                                    </li>
-                                    <li className="dropdown__item"><a href="#" ng-model="cardPack" id="deckFib"
-                                                                      ng-click="setCardPack('fib')">Fibonacci</a></li>
-                                    <li className="dropdown__item"><a href="#" ng-model="cardPack" id="deckSeq"
-                                                                      ng-click="setCardPack('seq')">Sequential</a></li>
-                                    <li className="dropdown__item"><a href="#" ng-model="cardPack" id="deckPlay"
-                                                                      ng-click="setCardPack('play')">Playing Cards</a>
-                                    </li>
-                                    <li className="dropdown__item"><a href="#" ng-model="cardPack" id="deckShirt"
-                                                                      ng-click="setCardPack('tshirt')">T-Shirt</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <CardPackSelector selectedDeck={state.cardPack} selectDeck={(d: Decks) => { props.api.setCardPack(d) }} />
                 </div>
 
+                {/*<div className="cards{{cardsState}}">*/}
+                <div className="cards">
+                    {chooseCardPack(state.cardPack).map((card) => {
+                        return (
+                            <div className="card"  ng-class="{'card--selected' : card==myVote}" >
+                                {card}
+                            </div>
+                        )
 
-                <div className="cards{{cardsState}}">
-                    <div ng-show="cards" ng-repeat="card in cards" ng-click="vote(card)" className="card"
-                         ng-class="{'card--selected' : card==myVote}" >
-                        card
-                    </div>
+                    })}
+
                     <div ng-hide="cards" className="waiting">
                         No cards found
                     </div>
@@ -109,6 +113,58 @@ export function Room() {
 
                 </div>
             </section>
+        </div>
+    );
+}
+
+
+interface ICardPackSelectorProps {
+    selectedDeck: Decks;
+
+    selectDeck: (d: Decks) => void;
+}
+
+const DeckNames = {
+    [Decks.GOAT]: "Mountain Goat",
+    [Decks.FIB]: "Fibonacci",
+    [Decks.SEQ]: "Sequential",
+    [Decks.PLAY]: "Playing Cards",
+    [Decks.TSHIRT]: "T-Shirt"
+}
+
+const DeckOrder = [
+    Decks.GOAT,
+    Decks.FIB,
+    Decks.SEQ,
+    Decks.PLAY,
+    Decks.TSHIRT
+]
+
+function CardPackSelector(props: ICardPackSelectorProps) {
+    const [opened, setOpened]  = useState(false)
+
+    const loggedSetOpened = (val: Decks) => {
+        return (e: React.MouseEvent) => {
+            setOpened(!opened)
+
+            e.stopPropagation()
+
+            props.selectDeck(val)
+        }
+    }
+
+    return (
+        <div ng-switch className="span2 pullright">
+            <div ng-switch-when="true">
+                <div id="dd" onClick={() => setOpened(!opened)} className={`dropdown-wrapper btn ${opened ? "active" : ""}`}>
+                    <span>{DeckNames[props.selectedDeck]}</span>
+                    <ul className="dropdown">
+                        {DeckOrder.map((deck) => {
+                            return (<li className="dropdown__item" onClick={loggedSetOpened(deck)}><a href={"#"} id="deckGoat">{DeckNames[deck]}</a></li>)
+                        })}
+                    </ul>
+                </div>
+            </div>
         </div>
     );
 }

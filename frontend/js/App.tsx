@@ -1,9 +1,11 @@
 import * as React from "react";
-import {Route} from "react-router";
+import {Route, useParams} from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import {Lobby} from "./lobby/Lobby";
 import {Api} from "./api/Api";
 import {Room} from "./room/Room";
+import {useEffect} from "react";
+import {filter, take} from "rxjs/operators";
 
 const api = new Api()
 
@@ -29,27 +31,51 @@ export function App() {
 
 
 export function LobbyPage() {
-    return [
-        <Header />,
-        <div className="content">
-            <Lobby api={api} />
-        </div>
-    ]
+    return (
+        <React.Fragment>
+            <Header />
+            <div className="content">
+                <Lobby api={api} />
+            </div>
+        </React.Fragment>
+    )
 }
 
 export function RoomPage() {
-    return [
-        <Header />,
-        <div className="alert">
-            <div className="activity" >Activity&hellip;</div>
-            <div className="socketMessage"></div>
-            <div className="appError"></div>
-            <div className="message"></div>
-        </div>,
-        <div className="content">
-            <Room />
-        </div>
-    ]
+    const params = useParams<{id: string}>()
+
+    useEffect(() => {
+        if (api.connected.value) {
+            api.joinRoom(params.id)
+        } else {
+            const subscription = api.connected.pipe(
+                filter((e) => e),
+                take(1)
+            ).subscribe(() => {
+                api.joinRoom(params.id)
+            });
+
+            return () => {
+                console.log("asdfsadfd")
+                subscription.unsubscribe()
+            }
+        }
+    })
+
+    return (
+        <React.Fragment>
+            <Header />
+            <div className="alert">
+                <div className="activity" >Activity&hellip;</div>
+                <div className="socketMessage"></div>
+                <div className="appError"></div>
+                <div className="message"></div>
+            </div>
+            <div className="content">
+                <Room api={api} />
+            </div>
+        </React.Fragment>
+    )
 }
 
 

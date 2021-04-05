@@ -28,8 +28,9 @@ export function Lobby(props: ILobbyProperties) {
                 <div className="row">
                     <button ng-click="createRoom()" id="createRoom" className="span1 btn"
                             title="Create a new planning poker room"
-                            type="button" onClick={() => props.api.createRoom().then((url) => {
-                                history.push(url);
+                            type="button" onClick={() => props.api.createRoom().then((room) => {
+                                console.log(room)
+                                history.push(`/${room.roomUrl}`);
                     })}>Create new room
                     </button>
                 </div>

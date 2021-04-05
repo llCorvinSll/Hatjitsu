@@ -5,7 +5,7 @@ import http from 'http';
 import * as socketio from "socket.io";
 import {Lobby} from "./lib/lobby";
 import {Room} from "./lib/room";
-import {Commands} from "@shared/protocol";
+import {Commands} from "../shared/protocol";
 
 // const env = process.env.NODE_ENV || 'development';
 const env = 'development';
@@ -119,6 +119,7 @@ app.get('/:id', function(req, res) {
 
 /* EVENT LISTENERS */
 
+
 io.on('connection', function (socket) {
   statsConnectionCount++;
   statsSocketCount++;
@@ -130,15 +131,16 @@ io.on('connection', function (socket) {
     lobby.broadcastDisconnect(socket);
   });
 
-  socket.on('create room', function (data, callback) {
+  socket.on(Commands.CREATE_ROOM, function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("on create room", socket.id, data);
-    callback(lobby.createRoom());
+    let room = lobby.createRoom();
+    callback(room.json());
   });
 
-  socket.on('join room', function (data, callback) {
+  socket.on(Commands.JOIN_ROOM, function (data, callback) {
     statsSocketMessagesReceived++;
-    // console.log("on join room " + data.roomUrl, socket.id, data);
+    console.log("on join room " + data.roomUrl, socket.id, data);
     const room = lobby.joinRoom(socket, data);
     if(!(room instanceof Room) && room.error) {
       callback( { error: room.error } );
@@ -163,13 +165,14 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('set card pack', function (data, cardPack) {
+  socket.on(Commands.SET_CARD_PACK, function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("on set card pack " + data.cardPack + " for " + data.roomUrl, socket.id, data);
     const room = lobby.getRoom(data.roomUrl);
     // console.log("error=" + room.error);
     if (room instanceof Room) {
       room.setCardPack(data);
+      callback(room.json())
     }
   });
 
