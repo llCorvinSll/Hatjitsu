@@ -21,5 +21,10 @@ backend/lib/*.js
 backend/lib/*.js.map
 backend/server.js
 backend/server.js.map
+shared/*.js
+shared/*.js.map
+shared/*.d.ts
 
 frontend/_build
+
+*.tsbuildinfo

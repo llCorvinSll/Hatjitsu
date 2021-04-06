@@ -60,7 +60,7 @@ export function RoomPage() {
                 subscription.unsubscribe()
             }
         }
-    })
+    }, [params.id])
 
     return (
         <React.Fragment>

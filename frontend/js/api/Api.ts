@@ -50,6 +50,18 @@ export class Api {
         })
     }
 
+    vote(vote: string) {
+        this.socket.emit(Commands.VOTE, { roomUrl: this.currentRoom.value.roomUrl, vote: vote, sessionId: this.sessionId!! },  (room) => {
+            this.currentRoom.next(room)
+        });
+    };
+
+    unvote() {
+        this.socket.emit(Commands.UNVOTE, {roomUrl: this.currentRoom.value.roomUrl, sessionId: this.sessionId!! }, (room) => {
+            this.currentRoom.next(room)
+        });
+    }
+
     joinRoom(roomId: string) {
         this.subscribeToRoomEvents()
 
@@ -82,7 +94,7 @@ export class Api {
         createdAt: "",
         createAdmin: false,
         hasAdmin: false,
-        cardPack: Decks.GOAT,
+        cardPack: null,
         forcedReveal: false,
         alreadySorted: false,
         connections: []
@@ -90,7 +102,7 @@ export class Api {
 
     public connected: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-    private sessionId?: string;
+    sessionId?: string;
 }
 
 

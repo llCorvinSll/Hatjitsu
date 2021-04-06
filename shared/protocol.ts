@@ -5,10 +5,11 @@ export const enum Commands {
     FORCE_REVEAL = 'force reveal',
     TOGGLE_VOTER  = 'toggle voter',
     RESET_VOTE = 'reset vote',
-    UNVOTE = 'unvote',
     CREATE_ROOM = 'create room',
     JOIN_ROOM  = 'join room',
-    SET_CARD_PACK = 'set card pack'
+    SET_CARD_PACK = 'set card pack',
+    VOTE  = 'vote',
+    UNVOTE = 'unvote',
 }
 
 export const enum ServerEvents {
@@ -29,7 +30,7 @@ export interface IRoomState {
     createdAt:string;
     createAdmin:boolean;
     hasAdmin:boolean;
-    cardPack: Decks;
+    cardPack: Decks | null;
     forcedReveal:boolean;
     alreadySorted:boolean;
     connections: IConnectionDescription[];
@@ -43,6 +44,8 @@ export interface ClientEmitMap {
     [Commands.CREATE_ROOM]: (some: null, cb: (url: IRoomState) => void) => void;
     [Commands.JOIN_ROOM]: (some: { roomUrl: string, sessionId: string }, cb: (url: IRoomState) => void) => void;
     [Commands.SET_CARD_PACK]: (some: { roomUrl: string, cardPack: Decks }, cb: (url: IRoomState) => void) => void;
+    [Commands.VOTE]: (some: { roomUrl: string, vote: string, sessionId: string }, cb: (url: IRoomState) => void) => void;
+    [Commands.UNVOTE]: (some: { roomUrl: string, sessionId: string }, cb: (url: IRoomState) => void) => void;
 }
 
 export interface ClientListenMap {

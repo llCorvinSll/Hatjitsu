@@ -8,7 +8,7 @@ import {Room} from "./lib/room";
 import {Commands} from "../shared/protocol";
 
 // const env = process.env.NODE_ENV || 'development';
-const env = 'development';
+const env :string = 'development';
 
 const gzippo = require('gzippo');
 const config = require('../config.js')[env];
@@ -176,7 +176,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('vote', function (data, callback) {
+  socket.on(Commands.VOTE, function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("on vote " + data.vote + " received for " + data.roomUrl, socket.id, data);
     const room = lobby.getRoom(data.roomUrl);
@@ -185,8 +185,10 @@ io.on('connection', function (socket) {
     } else {
       if (room instanceof Room) {
         room.recordVote(socket, data);
+        callback(room.json());
+      } else {
+        callback({});
       }
-      callback( {} );
     }
   });
 
@@ -199,8 +201,10 @@ io.on('connection', function (socket) {
     } else {
       if (room instanceof Room) {
         room.destroyVote(socket, data);
+        callback( room.json() );
+      } else {
+        callback({})
       }
-      callback( {} );
     }
   });
 

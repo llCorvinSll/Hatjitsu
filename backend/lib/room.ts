@@ -59,7 +59,7 @@ export class Room {
     this.io.sockets.in(this.roomUrl).emit('voter status changed');
   }
 
-  recordVote(socket: socketio.Socket, data) {
+  recordVote(socket: socketio.Socket, data: { roomUrl: string, vote: string, sessionId: string }) {
     if (this.connections[data.sessionId]) {
       this.connections[data.sessionId]['vote'] = data.vote;
     }
@@ -67,7 +67,7 @@ export class Room {
     // this.io.sockets.in(this.roomUrl).emit('voted');
   }
 
-  destroyVote(socket: socketio.Socket, data) {
+  destroyVote(socket: socketio.Socket, data: { roomUrl: string, sessionId: string }) {
     if (this.connections[data.sessionId]) {
       this.connections[data.sessionId]['vote'] = null;
     }
